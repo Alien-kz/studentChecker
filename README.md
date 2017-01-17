@@ -5,7 +5,7 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 Подразумевается, что несколько студентов пишут несколько одинаковых программ.
 Далее этого код собирается локально на маишне с LINUX и bash.
 
-0. Разложить программы студентов по каталогам внутри некоторого каталога (например, Практикум/ или текущего ./):
+Предварительно необходимо разложить программы студентов по каталогам внутри некоторого каталога:
 
 	Иванов/prog1.с
 	Иванов/prog2.с
@@ -15,7 +15,7 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 
 Далее запустить скрипт fcheck.sh. Рекомендуется запускать скрипт на уровне расположения тестировуемого каталога.
 
-1. Выбор каталога
+0. Выбор каталога
 
 	Choose directory:
 	Практикум/ каталог1/ каталог2/
@@ -28,7 +28,7 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 	Иванов
 	Петров
 
-2. Выбор программного суффикса
+0. Выбор программного суффикса
 
 	Choose code suffix: pas, c, cpp
 
@@ -42,7 +42,7 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 
 Создается check-rename.log с описанием переименований.
 
-3. Проверка на плагиат
+0. Проверка на плагиат
 
   Check plagiat?
 
@@ -54,7 +54,7 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 
 Создается check-plagiat.log с описанием плагиата.
 
-4. Компиляция
+0. Компиляция
 
   Compile?
 
@@ -66,7 +66,7 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 
 Символ X - не скомпилировалась. Создается check-compile.log с описанием ошибок компиляций и предупреждений.
 
-5. Запуск (вводится номер программы)
+0. Запуск (вводится номер программы)
 
   Run program #: 
 
@@ -93,13 +93,13 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 Если ничего не вводить, то будет показан стандартный вывод программы.
   ab
 
-6. Вердикт
+0. Вердикт
 
   Correct (default = yes, y/n): 
 
 Ввод [ENTER] - верно, ввод n - неверно.
 
-7. Переход к следующей задаче
+0. Переход к следующей задаче
 
   Exit? (x)
 
