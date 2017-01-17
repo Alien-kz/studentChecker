@@ -18,15 +18,12 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 0. Выбор каталога
 	Choose directory:
 	Практикум/ каталог1/ каталог2/
-
 Можно выбрать каталог (в том числе и текущий ./). 
 Необходимо набрать каталог и нажать ENTER. 
 Выведется список студентов (вложенные подкаталоги):
-
 	Users:
 	Иванов
 	Петров
-
 0. Выбор программного суффикса
 
 	Choose code suffix: pas, c, cpp
