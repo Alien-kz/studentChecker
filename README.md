@@ -16,7 +16,6 @@ Autocheck students simple code (gcc, g++, fpc): rename, compile, run, result.
 Далее запустить скрипт fcheck.sh. Рекомендуется запускать скрипт на уровне расположения тестировуемого каталога.
 
 0. Выбор каталога
-
 	Choose directory:
 	Практикум/ каталог1/ каталог2/
 
