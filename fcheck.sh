@@ -6,7 +6,6 @@ GREEN='\033[0;32m'
 GRAY='\033[0;37m'
 NC='\033[0m'
 
-
 ############################## DIRECTORY ##############################
 dir=""
 while true
@@ -73,18 +72,38 @@ done
 echo
 echo "User files:"
 
-spaces=""
-for (( i = 0; i < 15; i++))
-do
-	spaces=$spaces" "
-done
+spaceItem="%-7s"
+spaces="                   "
 
-problems=10; #max is 10
+echo
+echo "Would you like to test standard filename: 1, 2, 3, ..., 10 (with correspondly suffix)? (default = yes, from files.txt = no)"
+echo "y/n"
+read standardNumeration
+if [ "$standardNumeration" == "n" ]
+then
+	if [ -f "$dir/files.txt" ]
+	then
+		readarray -t problemName < "$dir/files.txt"
+		problems="${#problemName[@]}"
+	else
+		echo "No file: $dir/files.txt"
+		exit 0
+	fi
+else
+	standardNumeration=""
+	problems=10
+	for (( problem=0; problem < problems; problem++ ))
+	do
+		problemName[$problem]="$((problem+1))"
+	done
+fi
 
-echo -n "$spaces"
-for (( problem=1; problem <= problems; problem++ ))
+printf "$spaces"
+for (( problem=0; problem < problems; problem++ ))
 do
-	echo -n "$problem  "
+	prob=${problemName[$problem]}
+	printf "$spaceItem" "$prob"
+#	echo -n "${problemName[$problem]}  "
 done
 echo
 
@@ -92,40 +111,50 @@ echo
 
 for name in ${users[@]}
 do
-	echo -n "$name${spaces:${#name}}"
+#	printf "%-10s" $name				#work only in ascii
+	echo -n "$name${spaces:${#name}}"	#work in UTF8
 	sum=0
-	for (( problem=1; problem <= problems; problem++ ))
+	for (( problem=0; problem < problems; problem++ ))
 	do
 		userdir="$dir/$name"
-		template="*$problem.$suff"
+		prob=${problemName[$problem]}
+		template="*$prob.$suff"		
+		filename="$userdir/$prob.$suff"
 		
-		filename="$userdir/$problem.$suff"
-		for badfilename in $(find $userdir -name $template)
-		do
-			if [ "$badfilename" != "$filename" ]
-			then
-				mv -v "$badfilename" "$filename" >> check-rename.log
-			fi
-		done
+		if [ -z "$standardNumeration" ]
+		then
+			for badfilename in $(find $userdir -name $template)
+			do
+				if [ "$badfilename" != "$filename" ]
+				then
+					mv -v "$badfilename" "$filename" >> check-rename.log
+				fi
+			done
+		fi
 		
 		if [ -f $filename ]
 		then
-			echo -n -e "${GREEN}+  "
+			printf "${GREEN}$spaceItem" "+"
+#			echo -n -e "${GREEN}+  "
 			sum=$(($sum+1))
 		else
-			echo -n -e "${RED}-  "
+			printf "${RED}$spaceItem" "-"
+#			echo -n -e "${RED}-  "
 		fi
 	done
 	echo -e "${NC} $sum"
 done
-
-echo
-echo "Show check-rename.log? (default = no)"
-echo "y/n"
-read ans
-if [ "$ans" == "y" ]
+	
+if [ -z "$standardNumeration" ]
 then
-	cat check-rename.log
+	echo
+	echo "Show check-rename.log? (default = no)"
+	echo "y/n"
+	read ans
+	if [ "$ans" == "y" ]
+	then
+		cat check-rename.log
+	fi
 fi
 
 ############################## PLAGIAT ##############################
@@ -137,17 +166,21 @@ read ans
 if [ "$ans" = "y" ]
 then
 	> check-plagiat.log
-	for (( problem=1; problem <= problems; problem++ ))
+	for (( problem=0; problem < problems; problem++ ))
 	do
-		echo "Problem #$problem"
-		echo "Problem #$problem" >> check-plagiat.log
+		prob=${problemName[$problem]}
+		template="*$prob.$suff"		
+		filename="$userdir/$prob.$suff"
+
+		echo "Problem $prob"
+		echo "Problem $prob" >> check-plagiat.log
 		for (( i = 1; i <= userNumber; i++ ))
 		do
-			file1="$dir/${users[$i]}/$problem.$suff" 
+			file1="$dir/${users[$i]}/$prob.$suff" 
 			unset list
 			for (( j = 1; j <= userNumber; j++ ))
 			do
-				file2="$dir/${users[$j]}/$problem.$suff" 
+				file2="$dir/${users[$j]}/$prob.$suff" 
 				if [ -f "$file1" ] && [ -f "$file2" ] && [ "$file1" != "$file2" ]
 				then
 					if diff -B -w -b "$file1" "$file2" &> /dev/null
@@ -186,9 +219,10 @@ if [ "$ans" != "n" ]
 then
 	> check-compile.log
 	echo -n "$spaces"
-	for (( problem=1; problem <= problems; problem++ ))
+	for (( problem=0; problem < problems; problem++ ))
 	do
-		echo -n "$problem  "
+		prob=${problemName[$problem]}
+		printf "$spaceItem" "$prob"
 	done
 	echo
 	
@@ -196,11 +230,12 @@ then
 	do
 		sum=0
 		echo -n "$name${spaces:${#name}}"
-		for (( problem=1; problem <= problems; problem++ ))
+		for (( problem=0; problem < problems; problem++ ))
 		do
+			prob=${problemName[$problem]}
 			userdir="$dir/$name"
-			filename="$userdir/$problem.$suff"
-			binaryname="$userdir/$problem"
+			filename="$userdir/$prob.$suff"
+			binaryname="$userdir/$prob"
 			unset result
 			if [ -f $filename ]
 			then
@@ -217,19 +252,22 @@ then
 
 				if [ $? -eq 0 ]
 				then
-					echo -n -e "${GREEN}+  "
+					#echo -n -e "${GREEN}+  "
+					printf "${GREEN}$spaceItem" "+"
 					sum=$(($sum+1))
 				else
-					echo -n -e "${RED}x  "
+#					echo -n -e "${RED}x  "
+					printf "${RED}$spaceItem" "x"
 				fi				
 
 				if [ -n "$result" ]
 				then
-					printf "$name $problem:\n" >> check-compile.log
+					printf "$name $prob:\n" >> check-compile.log
 					printf "%s\n\n" "$result" >> check-compile.log
 				fi
 			else
-				echo -n -e "${RED}-  "
+#				echo -n -e "${RED}-  "
+				printf "${RED}$spaceItem" "-"
 			fi
 		done
 		echo -e "${NC} $sum"
@@ -243,7 +281,6 @@ then
 		grep -v "^$" check-compile.log
 	fi
 fi
-
 
 ############################## RUN ##############################
 
@@ -267,12 +304,30 @@ done
 while true
 do
 	clear
+	for ((problem = 0; problem < problems; problem++))
+	do
+		echo -n "${problemName[$problem]} "
+	done
+	echo
+
 	echo -n "Run program #:"
-	read problem
-	if  [ "$problem" -lt 1 ] || [ "$problem" -gt "$problems" ]
+	read prob
+	for ((problem = 0; problem < problems; problem++))
+	do
+		if [ ${problemName[$problem]} == $prob ]
+		then
+			break
+		fi
+	done
+	
+	if [ $problem -eq $problems ]
 	then
-		exit 0
+		continue
 	fi
+#	if  [ "$problem" -lt 1 ] || [ "$problem" -gt "$problems" ]
+#	then
+#		exit 0
+#	fi
 
 	echo "Enter no input data if you want read from file 'f.txt'."
 	echo "Start input with '-' if you want run with arguments."
@@ -296,7 +351,7 @@ do
 	do
 		res="0"
 		name=${users[$i]}
-		filename="$dir/$name/$problem"
+		filename="$dir/$name/$prob"
 		resultfilename="$dir/$name/result.txt"
 
 		if [ -f $filename ]
@@ -361,12 +416,12 @@ do
 		fi
 
 		readarray -t result < $resultfilename
-		if [ ${result[$problem-1]} = "-" ]
+		if [ ${result[$problem]} = "-" ]
 		then
-			result[$problem-1]=$res
-		elif [ ${result[$problem-1]} = "1" ] && [ $res = "0" ]
+			result[$problem]=$res
+		elif [ ${result[$problem]} = "1" ] && [ $res = "0" ]
 		then
-			result[$problem-1]="0"
+			result[$problem]="0"
 		fi
 
 		printf "%s\n" "${result[@]}" > $resultfilename
@@ -387,22 +442,25 @@ do
 			then
 				sum=$(($sum+1))
 			fi
-			
+
 			if [ $r = "1" ]
 			then
-				echo -n -e "${GREEN}+  "
+				printf "${GREEN}$spaceItem" "+"
+#				echo -n -e "${GREEN}+  "
 			elif [ $r = "0" ]
 			then
-				echo -n -e "${RED}x  "
+				printf "${RED}$spaceItem" "x"
+#				echo -n -e "${RED}x  "
 			else
-				echo -n -e "${RED}-  "
+				printf "${RED}$spaceItem" "-"
+#				echo -n -e "${RED}-  "
 			fi
 		done
 		echo -e "${NC} $sum"
 	done
 	echo "Exit? (x)"
-	read problem
-	if [ $problem = "x" ]
+	read exitAnswer
+	if [ $exitAnswer = "x" ]
 	then
 		break
 	fi
@@ -415,10 +473,13 @@ clear
 
 echo -n "$spaces"
 echo -n "Имя " >> "$dir/result.txt"
-for (( problem=1; problem <= problems; problem++ ))
+for (( problem=0; problem < problems; problem++ ))
 do
-	echo -n "$problem "
-	echo -n "$problem " >> "$dir/result.txt"
+	prob=${problems[problem]}
+	printf "$spaceItem" $prob
+	printf "$spaceItem" $prob >> "$dir/result.txt"
+#	echo -n "$problem "
+#	echo -n "$problem " >> "$dir/result.txt"
 done
 
 echo "Итог"
@@ -443,15 +504,21 @@ do
 		
 		if [ $r == "1" ]
 		then
-			echo -n -e "${GREEN}+ "
-			echo -n "1 " >> "$dir/result.txt"
+			printf "${GREEN}$spaceItem" "+"
+			printf "$spaceItem" "+" >> "$dir/result.txt"
+#			echo -n -e "${GREEN}+ "
+#			echo -n "1 " >> "$dir/result.txt"
 		elif [ $r == "0" ]
 		then
-			echo -n -e "${RED}x "
-			echo -n "0 " >> "$dir/result.txt"
+			printf "${RED}$spaceItem" "x"
+			printf "$spaceItem" "x" >> "$dir/result.txt"
+#			echo -n -e "${RED}x "
+#			echo -n "0 " >> "$dir/result.txt"
 		else
-			echo -n -e "${RED}- "
-			echo -n "- " >> "$dir/result.txt"
+			printf "${RED}$spaceItem" "-"
+			printf "$spaceItem" "-" >> "$dir/result.txt"
+#			echo -n -e "${RED}- "
+#			echo -n "- " >> "$dir/result.txt"
 		fi
 	done
 	echo -e "${NC} $sum"
