@@ -475,7 +475,7 @@ echo -n "$spaces"
 echo -n "Имя " >> "$dir/result.txt"
 for (( problem=0; problem < problems; problem++ ))
 do
-	prob=${problems[problem]}
+	prob=${problems[$problem]}
 	printf "$spaceItem" $prob
 	printf "$spaceItem" $prob >> "$dir/result.txt"
 #	echo -n "$problem "
