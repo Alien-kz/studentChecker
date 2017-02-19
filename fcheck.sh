@@ -343,7 +343,7 @@ do
 	read fileout
 	if [[ ! -z $fileout ]]
 	then
-		echo "Print *.txt"
+		echo "Output *.txt"
 		echo
 	fi
 
@@ -477,9 +477,9 @@ for (( problem=0; problem < problems; problem++ ))
 do
 	prob=${problems[$problem]}
 	printf "$spaceItem" $prob
-	printf "$spaceItem" $prob >> "$dir/result.txt"
+#	printf "$spaceItem" $prob >> "$dir/result.txt"
 #	echo -n "$problem "
-#	echo -n "$problem " >> "$dir/result.txt"
+	echo -n "$problem " >> "$dir/result.txt"
 done
 
 echo "Итог"
@@ -505,20 +505,20 @@ do
 		if [ $r == "1" ]
 		then
 			printf "${GREEN}$spaceItem" "+"
-			printf "$spaceItem" "+" >> "$dir/result.txt"
+#			printf "$spaceItem" "+" >> "$dir/result.txt"
 #			echo -n -e "${GREEN}+ "
-#			echo -n "1 " >> "$dir/result.txt"
+			echo -n "1 " >> "$dir/result.txt"
 		elif [ $r == "0" ]
 		then
 			printf "${RED}$spaceItem" "x"
-			printf "$spaceItem" "x" >> "$dir/result.txt"
+#			printf "$spaceItem" "x" >> "$dir/result.txt"
 #			echo -n -e "${RED}x "
-#			echo -n "0 " >> "$dir/result.txt"
+			echo -n "0 " >> "$dir/result.txt"
 		else
 			printf "${RED}$spaceItem" "-"
-			printf "$spaceItem" "-" >> "$dir/result.txt"
+#			printf "$spaceItem" "-" >> "$dir/result.txt"
 #			echo -n -e "${RED}- "
-#			echo -n "- " >> "$dir/result.txt"
+			echo -n "- " >> "$dir/result.txt"
 		fi
 	done
 	echo -e "${NC} $sum"
